@@ -21,9 +21,9 @@ Enter the transaction details below to get a prediction.
 @st.cache_resource
 def load_models():
     try:
-        model = pickle.load(open(r"D:\ML_Project\xgb_fraud_model.pkl", "rb"))
-        encoder = pickle.load(open(r"D:\ML_Project\encoder.pkl", "rb"))
-        features = pickle.load(open(r"D:\ML_Project\features.pkl", "rb"))
+        model = pickle.load(open("xgb_fraud_model.pkl", "rb"))
+        encoder = pickle.load(open("encoder.pkl", "rb"))
+        features = pickle.load(open("features.pkl", "rb"))
         return model, encoder, features
     except FileNotFoundError as e:
         st.error(f"Model files not found. Please ensure 'xgb_fraud_model.pkl', 'encoder.pkl', and 'features.pkl' are in the same directory as this script.")
