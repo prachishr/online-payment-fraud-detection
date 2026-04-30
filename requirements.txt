@@ -1,0 +1,10 @@
+REQUIREMENTS :
+
+
+streamlit
+pandas
+numpy
+seaborn 
+matplotlib
+scikit-learn
+xgboost
