@@ -61,6 +61,7 @@ The model is optimized to maximize recall, ensuring that more fraudulent transac
 
 * Python
 * Pandas & NumPy
+* Seaborn & Matplotlib
 * Scikit-learn
 * XGBoost
 * Streamlit
@@ -88,13 +89,13 @@ fraud-detection/
 1. Clone the repository:
 
 ```
-git clone https://github.com/your-username/fraud-detection.git
+git clone https://github.com/prachishr/online-payment-fraud-detection.git
 ```
 
 2. Navigate to the project folder:
 
 ```
-cd fraud-detection
+cd online-payment-fraud-detection
 ```
 
 3. Install dependencies:
