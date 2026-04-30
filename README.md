@@ -107,7 +107,7 @@ pip install -r requirements.txt
 4. Run the Streamlit app:
 
 ```
-streamlit run app.py
+https://online-payment-fraud-detection-4qetcnhc5z5hkj7n3shzgx.streamlit.app/
 ```
 
 ---
@@ -120,7 +120,8 @@ The application can be deployed using Streamlit Community Cloud for free hosting
 
 ## 📸 Demo
 
-(Add your app screenshot here after deployment)
+<img width="1911" height="965" alt="image" src="https://github.com/user-attachments/assets/1ec47886-41af-4ae4-8a8d-ffcde1a9f782" />
+
 
 ---
 
