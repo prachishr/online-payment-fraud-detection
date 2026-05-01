@@ -1,5 +1,8 @@
 # 💳 Online Payment Fraud Detection System
 
+## 🚀 Live Demo  
+👉 [Click here to run the app](https://online-payment-fraud-detection-4qetcnhc5z5hkj7n3shzgx.streamlit.app/)
+
 
 ## 📌 Project Overview
 
