@@ -107,7 +107,10 @@ pip install -r requirements.txt
 4. Run the Streamlit app:
 
 ```
-https://online-payment-fraud-detection-4qetcnhc5z5hkj7n3shzgx.streamlit.app/
+<a href="https://online-payment-fraud-detection-4qetcnhc5z5hkj7n3shzgx.streamlit.app/" target="_blank">
+Run the Streamlit App
+</a>
+
 ```
 
 ---
