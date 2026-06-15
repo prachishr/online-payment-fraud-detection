@@ -43,20 +43,36 @@ The project follows a structured ML pipeline:
 
 Final model: **XGBoost**
 
-* Recall: ~0.68
-* Precision: ~0.24
-* F1 Score: ~0.35
+| Metric    | Score  |
+| --------- | ------ |
+| Accuracy  | 99.92% |
+| Precision | 75.4%  |
+| Recall    | 55.1%  |
+| F1 Score  | 63.7%  |
 
-The model is optimized to maximize recall, ensuring that more fraudulent transactions are detected.
+### Cross Validation
 
----
+* 5-Fold Stratified Cross Validation Mean F1 Score: **53.8%**
+
+### Model Optimization
+
+The final model performance was improved through:
+
+* Feature Engineering
+* Class Imbalance Handling using `scale_pos_weight`
+* Threshold Optimization
+* Removal of harmful outlier clipping on financial transaction features
+
+The optimal classification threshold was found to be **0.9**, improving the F1-score from approximately **0.42** to **0.64**.
+
 
 ## 🔍 Key Insights
 
-* Fraud detection depends on behavioral patterns, not just transaction amount
-* Balance inconsistencies play a major role in identifying fraud
-* Threshold tuning helps balance precision and recall
-* High recall is preferred to avoid missing fraud cases
+* Fraud detection depends on transaction behavior patterns rather than transaction amount alone
+* Balance inconsistencies and account balance changes are strong fraud indicators
+* Financial transaction outliers contain useful fraud signals and should not always be removed
+* Threshold optimization significantly reduced false positives while improving overall F1-score
+* Precision, Recall, and F1-score are more reliable evaluation metrics than Accuracy for highly imbalanced fraud datasets
 
 ---
 
@@ -71,21 +87,21 @@ The model is optimized to maximize recall, ensuring that more fraudulent transac
 
 ---
 
+
 ## 📂 Project Structure
 
-```
-fraud-detection/
+```text
+online-payment-fraud-detection/
 │
 ├── app.py
-├── fraud_model.pkl
+├── xgb_fraud_model.pkl
 ├── encoder.pkl
 ├── features.pkl
 ├── requirements.txt
 ├── README.md
-├── model_training.ipynb
+├── Online_Payment_Fraud_Detection.ipynb
 ```
 
----
 
 ## ▶️ How to Run Locally
 
