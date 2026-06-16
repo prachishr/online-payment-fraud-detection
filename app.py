@@ -34,33 +34,21 @@ def load_models():
 
 model, encoder, feature_columns = load_models()
 
-# Define IQR bounds (calculated from your training data)
-# These should match the clipping values used during training
-def get_iqr_bounds():
-    """Return IQR bounds for outlier clipping - adjust these values based on your training data"""
-    # These are approximate bounds - you should extract exact values from your training data
-    bounds = {
-        'amount': (0, 2000000),  # Adjust based on your data
-        'oldbalanceorg': (0, 50000000),
-        'newbalanceorig': (0, 50000000),
-        'oldbalancedest': (0, 50000000),
-        'newbalancedest': (0, 50000000),
-    }
-    return bounds
+
 
 # Sidebar for input
 st.sidebar.header("📊 Transaction Details")
 
 # Transaction type selection
+
 transaction_types = {
     "CASHIN": "Cash In",
-    "CASHOUT": "Cash Out", 
+    "CASHOUT": "Cash Out",
     "DEBIT": "Debit",
     "PAYMENT": "Payment",
     "TRANSFER": "Transfer"
 }
 
-# Input fields
 transaction_type = st.sidebar.selectbox(
     "Transaction Type",
     options=list(transaction_types.keys()),
@@ -69,35 +57,30 @@ transaction_type = st.sidebar.selectbox(
 
 amount = st.sidebar.number_input(
     "Transaction Amount",
-    
     value=50000.0,
     step=10000.0
 )
 
 oldbalanceOrg = st.sidebar.number_input(
     "Original Balance (Origin Account)",
-    
     value=100000.0,
     step=50000.0
 )
 
 newbalanceOrig = st.sidebar.number_input(
     "New Balance (Origin Account)",
-    
     value=50000.0,
     step=50000.0
 )
 
 oldbalanceDest = st.sidebar.number_input(
     "Original Balance (Destination Account)",
-    
     value=50000.0,
     step=50000.0
 )
 
 newbalanceDest = st.sidebar.number_input(
     "New Balance (Destination Account)",
-    
     value=100000.0,
     step=50000.0
 )
@@ -116,16 +99,8 @@ isFlaggedFraud = st.sidebar.selectbox(
     format_func=lambda x: "Yes" if x == 1 else "No"
 )
 
-def apply_outlier_clipping(df, bounds):
-    """Apply same outlier clipping as during training"""
-    for col, (lower, upper) in bounds.items():
-        if col in df.columns:
-            df[col] = df[col].clip(lower, upper)
-    return df
-
-# Create input dataframe
 def create_input_dataframe():
-    """Create a DataFrame from user inputs with proper preprocessing"""
+
     input_data = {
         'step': step,
         'amount': amount,
@@ -136,29 +111,62 @@ def create_input_dataframe():
         'isflaggedfraud': isFlaggedFraud,
         'type': transaction_type
     }
-    
+
     df = pd.DataFrame([input_data])
-    
-    # Apply outlier clipping (IMPORTANT - matches training preprocessing)
-    bounds = get_iqr_bounds()
-    df = apply_outlier_clipping(df, bounds)
-    
-    # One-hot encode the type column
+
+    # Feature Engineering
+
+    df["balance_diff_orig"] = (
+        df["oldbalanceorg"] - df["newbalanceorig"]
+    )
+
+    df["balance_diff_dest"] = (
+        df["newbalancedest"] - df["oldbalancedest"]
+    )
+
+    df["amount_balance_ratio"] = (
+        df["amount"] / (df["oldbalanceorg"] + 1)
+    )
+
+    df["orig_zero_after"] = (
+        df["newbalanceorig"] == 0
+    ).astype(int)
+
+    df["dest_zero_before"] = (
+        df["oldbalancedest"] == 0
+    ).astype(int)
+
+    df["is_cashout_or_transfer"] = (
+        df["type"].isin(["CASHOUT", "TRANSFER"])
+    ).astype(int)
+
+    df["error_balance_orig"] = (
+        df["oldbalanceorg"]
+        - df["amount"]
+        - df["newbalanceorig"]
+    )
+
+    df["error_balance_dest"] = (
+        df["oldbalancedest"]
+        + df["amount"]
+        - df["newbalancedest"]
+    )
+
     type_encoded = encoder.transform(df[['type']])
+
     type_df = pd.DataFrame(
         type_encoded,
         columns=encoder.get_feature_names_out(['type']),
         index=df.index
     )
-    
-    # Concatenate and drop original type column
+
     df = pd.concat([df, type_df], axis=1)
     df = df.drop('type', axis=1)
-    
-    # Reindex to match training features
+
     df = df.reindex(columns=feature_columns, fill_value=0)
-    
+
     return df
+
 
 # Prediction button
 predict_button = st.sidebar.button("🔍 Predict Fraud", type="primary", use_container_width=True)
@@ -190,18 +198,26 @@ with col2:
 # Make prediction
 if predict_button:
     try:
+        
         input_df = create_input_dataframe()
-        
-        prediction = model.predict(input_df)[0]
+
         probability = model.predict_proba(input_df)[0][1]
+
         
+        THRESHOLD = 0.9
+
+        if probability >= THRESHOLD:
+            prediction = 1
+        else:
+            prediction = 0
+
         st.markdown("---")
         st.subheader("🎯 Prediction Result")
         
         col_res1, col_res2 = st.columns(2)
         
         with col_res1:
-            if prediction == 1:
+            if prediction >= 1:
                 st.error("⚠️ FRAUD ALERT! This transaction appears FRAUDULENT")
             else:
                 st.success("✅ This transaction appears LEGITIMATE")
@@ -224,9 +240,9 @@ if predict_button:
         if abs(oldbalanceOrg - newbalanceOrig - amount) > 1:
             risk_factors.append("❌ Balance mismatch in origin account")
         
-        if probability > 0.5:
+        if probability > THRESHOLD:
             risk_factors.append(f"🔴 High fraud probability ({fraud_prob:.1f}%)")
-        
+
         if risk_factors:
             for factor in risk_factors:
                 st.write(factor)
